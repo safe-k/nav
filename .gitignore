@@ -1,0 +1,6 @@
+# Development
+.idea
+.DS_Store
+
+# Config
+map.config

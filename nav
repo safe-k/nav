@@ -1,0 +1,94 @@
+#!/bin/bash
+
+NAV_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+config="$NAV_PATH/map.config"
+
+help_pin="Usage: nav pin [location] [alias]"
+help_to="Usage: nav to [alias]"
+help_rm="Usage: nav rm [alias]"
+
+resolve_alias () {
+    echo `grep "$1" "$config" | cut -d '=' -f 2`
+}
+
+alias_location () {
+    local location=$1
+    local alias=$2
+
+    if [[ -z "$location" || -z "$alias" ]]; then
+        echo "$help_pin"
+        return 0
+    fi
+
+    if [ ${location:0:1} = "." ]; then
+        location="$(pwd)${location:1}"
+    elif [ ${location:0:1} = "~" ]; then
+        location="$(~)${location:1}"
+    fi
+
+    existingAlias=$(resolve_alias "$alias")
+    if [ ! -z existingAlias ]; then
+        echo "Overwriting existing value for $alias"
+        delete_alias "$alias"
+    fi
+
+    echo "$alias=$location" >> "$config"
+}
+
+goto_location () {
+    local alias=$1
+
+    if [ -z "$alias" ]; then
+        echo "$help_to"
+        return 0
+    fi
+
+    local location=$(resolve_alias "$alias")
+
+    cd "$location"
+}
+
+delete_alias () {
+    local alias=$1
+
+    if [ -z "$alias" ]; then
+        echo "$help_rm"
+        return 0;
+    fi
+
+    sed -i '' "/^$alias/d" "$config"
+}
+
+list_aliases () {
+    cat "$config"
+}
+
+get_installation_location () {
+    echo "$NAV_PATH"
+}
+
+get_usage_instructions () {
+    echo "Available actions:"
+    echo "- pin ($help_pin)"
+    echo "- to ($help_to)"
+    echo "- rm ($help_rm)"
+    echo "- list"
+    echo "- which"
+}
+
+nav () {
+    action=$1
+
+    case "$action" in
+        (pin) alias_location $2 $3;;
+        (to) goto_location $2;;
+        (list) list_aliases;;
+        (rm) delete_alias $2;;
+        (help) get_usage_instructions;;
+        (which) get_installation_location;;
+        (*) nav help ;;
+    esac
+}
+
+export nav
