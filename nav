@@ -1,20 +1,23 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 NAV_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 config="$NAV_PATH/map.config"
+if [ ! -f "$config" ]; then
+    touch "$config"
+fi
 
 help_pin="Usage: nav pin [location] [alias]"
 help_to="Usage: nav to [alias]"
 help_rm="Usage: nav rm [alias]"
 
 resolve_alias () {
-    echo `grep "$1" "$config" | cut -d '=' -f 2`
+    echo `grep "$1" "$config" | cut -d "=" -f 2`
 }
 
 alias_location () {
-    local location=$1
-    local alias=$2
+    local location="$1"
+    local alias="$2"
 
     if [[ -z "$location" || -z "$alias" ]]; then
         echo "$help_pin"
@@ -27,8 +30,8 @@ alias_location () {
         location="$(~)${location:1}"
     fi
 
-    existingAlias=$(resolve_alias "$alias")
-    if [ ! -z existingAlias ]; then
+    local existing_alias=$(resolve_alias "$alias")
+    if [ ! -z "$existing_alias" ]; then
         echo "Overwriting existing value for $alias"
         delete_alias "$alias"
     fi
@@ -37,7 +40,7 @@ alias_location () {
 }
 
 goto_location () {
-    local alias=$1
+    local alias="$1"
 
     if [ -z "$alias" ]; then
         echo "$help_to"
@@ -50,7 +53,7 @@ goto_location () {
 }
 
 delete_alias () {
-    local alias=$1
+    local alias="$1"
 
     if [ -z "$alias" ]; then
         echo "$help_rm"
@@ -78,13 +81,13 @@ get_usage_instructions () {
 }
 
 nav () {
-    action=$1
+    action="$1"
 
     case "$action" in
-        (pin) alias_location $2 $3;;
-        (to) goto_location $2;;
+        (pin) alias_location "$2" "$3";;
+        (to) goto_location "$2";;
         (list) list_aliases;;
-        (rm) delete_alias $2;;
+        (rm) delete_alias "$2";;
         (help) get_usage_instructions;;
         (which) get_installation_location;;
         (*) nav help ;;
