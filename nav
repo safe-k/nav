@@ -43,6 +43,11 @@ alias_location () {
         location="$(~)${location:1}"
     fi
 
+    if [ ! -d "$location" ]; then
+        echo "$location is not a directory"
+        return 0
+    fi
+
     local existing_alias=$(resolve_alias "$alias")
     if [ ! -z "$existing_alias" ]; then
         echo "Overwriting existing value for $alias"
