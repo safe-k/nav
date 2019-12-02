@@ -1,3 +1,5 @@
+![](https://github.com/safe-k/nav/workflows/Test/badge.svg)
+
 # nav
 
 A simple shell tool that enables file system location aliasing and navigation.
