@@ -12,7 +12,20 @@ help_to="Usage: nav to [alias]"
 help_rm="Usage: nav rm [alias]"
 
 resolve_alias () {
-    echo `grep "$1" "$config" | cut -d "=" -f 2`
+    local location
+
+    while read line; do
+        local alias=$(echo "$line" | cut -d "=" -f 1)
+
+        if [ "$1" == "$alias" ]; then
+            location=$(echo "$line" | cut -d "=" -f 2)
+            break;
+        fi
+    done < "$config"
+
+    if [ ! -z "$location" ]; then
+        echo "$location"
+    fi
 }
 
 alias_location () {
@@ -48,6 +61,11 @@ goto_location () {
     fi
 
     local location=$(resolve_alias "$alias")
+
+    if [ -z "$location" ]; then
+        echo "No alias found matching $alias"
+        return 0
+    fi
 
     cd "$location"
 }
