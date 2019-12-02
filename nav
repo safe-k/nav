@@ -39,6 +39,8 @@ alias_location () {
 
     if [ ${location:0:1} = "." ]; then
         location="$(pwd)${location:1}"
+    elif [ ! ${location:0:1} = "/" ]; then
+        location="$(pwd)/$location"
     elif [ ${location:0:1} = "~" ]; then
         location="$(~)${location:1}"
     fi
