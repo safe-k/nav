@@ -2,7 +2,7 @@
 
 NAV_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-config="$NAV_PATH/map.config"
+config="$NAV_PATH/.nav.config"
 if [ ! -f "$config" ]; then
     touch "$config"
 fi

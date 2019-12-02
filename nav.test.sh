@@ -21,7 +21,7 @@ run () {
     cd "$LAB_DIR"
 
     NAV="$LAB_DIR/nav"
-    NAV_CONFIG="$LAB_DIR/map.config"
+    NAV_CONFIG="$LAB_DIR/.nav.config"
     cp "$DIR/nav" "$NAV"
 
     source "$NAV"
