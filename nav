@@ -42,7 +42,7 @@ alias_location () {
     elif [ ! ${location:0:1} = "/" ]; then
         location="$(pwd)/$location"
     elif [ ${location:0:1} = "~" ]; then
-        location="$(~)${location:1}"
+        location="$("$location")"
     fi
 
     if [ ! -d "$location" ]; then
