@@ -40,6 +40,7 @@ run () {
     nav pin "$LAB_DIR/Someplace/Somewhere/Deep Inside" inside
 
     assert_equal "$(nav pin invalid-dir dir)" "$(pwd)/invalid-dir is not a directory"
+    assert_equal "$(nav pin . "£@invalid-name")" "Alias must only contain alphanumeric characters"
 
     ## to
     nav to place

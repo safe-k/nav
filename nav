@@ -50,6 +50,11 @@ alias_location () {
         return 0
     fi
 
+    if [[ "$alias" =~ [^a-zA-Z0-9] ]]; then
+        echo "Alias must only contain alphanumeric characters"
+        return 0
+    fi
+
     local existing_alias=$(resolve_alias "$alias")
     if [ ! -z "$existing_alias" ]; then
         echo "Overwriting existing value for $alias"
