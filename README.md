@@ -45,9 +45,9 @@ Lists all available location aliases.
 
 ```bash
 > nav list
-nav=/Users/seifkamal/src/nav
-home=/Users/seifkamal
-deep=/Users/seifkamal/somewplace/somewhere/deep
+deep      /Users/seifkamal/somewplace/somewhere/deep
+desktop   /Users/seifkamal/Desktop
+nav       /Users/seifkamal/projects/nav
 ```
 </p>
 </details>
@@ -76,6 +76,7 @@ Available actions:
 - rm (Usage: nav rm [alias])
 - list
 - which
+- update
 ```
 </p>
 </details>
@@ -99,7 +100,8 @@ Downloads the latest version of the executable.
 
 ```bash
 > nav update
-Executable updated. Please run `source /Users/seifkamal/src/nav/nav`
+Executable updated.
+Please run `source /Users/seifkamal/src/nav/nav`
 ```
 </p>
 </details>

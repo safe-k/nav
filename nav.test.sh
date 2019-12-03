@@ -73,8 +73,6 @@ run () {
 
 run
 
-#5 Print results
-
 if [ "$FAILS" = 0 ]; then
     echo "Pass"
 else
