@@ -22,7 +22,7 @@ echo "source nav" >> ~/.bash_profile
 Assigns an alias to the given location.
 
 ```bash
-nav pin [location] [alias]
+> nav pin [location] [alias]
 ```
 </p>
 </details>
@@ -33,7 +33,7 @@ nav pin [location] [alias]
 Navigates to the location assigned to the given alias.
 
 ```bash
-nav to [alias]
+> nav to [alias]
 ```
 </p>
 </details>
@@ -44,7 +44,10 @@ nav to [alias]
 Lists all available location aliases.
 
 ```bash
-nav list
+> nav list
+nav=/Users/seifkamal/src/nav
+home=/Users/seifkamal
+deep=/Users/seifkamal/somewplace/somewhere/deep
 ```
 </p>
 </details>
@@ -55,7 +58,7 @@ nav list
 Removes the given location alias.
 
 ```bash
-nav rm [alias]
+> nav rm [alias]
 ```
 </p>
 </details>
@@ -66,7 +69,13 @@ nav rm [alias]
 Prints out usage instructions.
 
 ```bash
-nav help
+> nav help
+Available actions:
+- pin (Usage: nav pin [location] [alias])
+- to (Usage: nav to [alias])
+- rm (Usage: nav rm [alias])
+- list
+- which
 ```
 </p>
 </details>
@@ -77,7 +86,8 @@ nav help
 Prints out the installation location.
 
 ```bash
-nav which
+> nav which
+/Users/seifkamal/src/nav
 ```
 </p>
 </details>
@@ -88,7 +98,8 @@ nav which
 Downloads the latest version of the executable.
 
 ```bash
-nav update
+> nav update
+Executable updated. Please run `source /Users/seifkamal/src/nav/nav`
 ```
 </p>
 </details>
