@@ -14,6 +14,10 @@ assert_equal () {
     fi
 }
 
+exec_nav () {
+    FORMAT="false" nav "$@"
+}
+
 run () {
     # 1 Setup lab
     LAB_DIR="$DIR/lab"
@@ -31,37 +35,37 @@ run () {
     mkdir -p "$LAB_DIR/Someplace/Somewhere/Deep Inside"
 
     ## which
-    assert_equal "$(nav which)" "$LAB_DIR"
+    assert_equal "$(exec_nav which)" "$LAB_DIR"
 
     ## pin
-    nav pin . lab
-    nav pin ./Someplace/ place
-    nav pin Someplace/Somewhere where
-    nav pin "$LAB_DIR/Someplace/Somewhere/Deep Inside" inside
+    exec_nav pin . lab
+    exec_nav pin ./Someplace/ place
+    exec_nav pin Someplace/Somewhere where
+    exec_nav pin "$LAB_DIR/Someplace/Somewhere/Deep Inside" inside
 
-    assert_equal "$(nav pin invalid-dir dir)" "$(pwd)/invalid-dir is not a directory"
-    assert_equal "$(nav pin . "£@invalid-name")" "Alias must only contain alphanumeric characters"
+    assert_equal "$(exec_nav pin invalid-dir dir)" "'$(pwd)/invalid-dir' is not a directory"
+    assert_equal "$(exec_nav pin . "£@invalid-name")" "Alias must only contain alphanumeric characters"
 
     ## to
-    nav to place
+    exec_nav to place
     assert_equal "$(pwd)" "$LAB_DIR/Someplace"
 
-    nav to where
+    exec_nav to where
     assert_equal "$(pwd)" "$LAB_DIR/Someplace/Somewhere"
 
-    nav to inside
+    exec_nav to inside
     assert_equal "$(pwd)" "$LAB_DIR/Someplace/Somewhere/Deep Inside"
 
-    nav to lab
+    exec_nav to lab
     assert_equal "$(pwd)" "$LAB_DIR"
 
     ## rm
-    nav rm where
-    nav rm inside
-    assert_equal "$(nav to inside)" "No alias found matching inside"
+    exec_nav rm where
+    exec_nav rm inside
+    assert_equal "$(exec_nav to inside)" "No alias found matching 'inside'"
 
     ## list
-    assert_equal "$(nav list)" "$(echo -e "lab=$LAB_DIR\nplace=$LAB_DIR/Someplace")"
+    assert_equal "$(exec_nav list)" "$(echo -e "lab=$LAB_DIR\nplace=$LAB_DIR/Someplace")"
 
     # 3 Destroy lab
     rm -r "$LAB_DIR"

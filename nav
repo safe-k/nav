@@ -7,9 +7,60 @@ if [ ! -f "$config" ]; then
     touch "$config"
 fi
 
+# Formatting config
+FORMAT="true"
+
+RED="\033[0;31m"
+BLUE="\033[0;34m"
+GREY="\033[0;37m"
+ORANGE="\033[0;33m"
+NC="\033[0m"
+
+BOLD=$(tput bold)
+NF=$(tput sgr0)
+
 help_pin="Usage: nav pin [location] [alias]"
 help_to="Usage: nav to [alias]"
 help_rm="Usage: nav rm [alias]"
+
+message () {
+    local type="$1"
+    local message="$2"
+
+    local colour="$NC"
+    local format="$NF"
+
+    if [ "$FORMAT" == "false" ]; then
+        echo "$message"
+    else
+        case "$type" in
+            (error)
+                colour="$RED"
+                message="Error: $message"
+                ;;
+            (warning)
+                colour="$ORANGE"
+                message="Warning: $message"
+                ;;
+            (info) colour="$GREY";;
+            (instruction) colour="$BLUE";;
+            (header) format="$BOLD";;
+            (table) "$message" | column -s "=" -t
+        esac
+
+        echo -e "${format}${colour}$message${NF}${NC}"
+    fi
+}
+
+get_usage_instructions () {
+    message header "Available actions:"
+    message generic "- $(message instruction pin) $(message info "($help_pin)")"
+    message generic "- $(message instruction to) $(message info "($help_to)")"
+    message generic "- $(message instruction rm) $(message info "($help_rm)")"
+    message generic "- $(message instruction list)"
+    message generic "- $(message instruction which)"
+    message generic "- $(message instruction update)"
+}
 
 resolve_alias () {
     local location
@@ -33,7 +84,7 @@ alias_location () {
     local alias="$2"
 
     if [[ -z "$location" || -z "$alias" ]]; then
-        echo "$help_pin"
+        message info "$help_pin"
         return 0
     fi
 
@@ -46,18 +97,18 @@ alias_location () {
     fi
 
     if [ ! -d "$location" ]; then
-        echo "$location is not a directory"
+        message error "'$location' is not a directory"
         return 0
     fi
 
     if [[ "$alias" =~ [^a-zA-Z0-9] ]]; then
-        echo "Alias must only contain alphanumeric characters"
+        message error "Alias must only contain alphanumeric characters"
         return 0
     fi
 
     local existing_alias=$(resolve_alias "$alias")
     if [ ! -z "$existing_alias" ]; then
-        echo "Overwriting existing value for $alias"
+        message warning "Overwriting existing value for '$alias'"
         delete_alias "$alias"
     fi
 
@@ -68,14 +119,14 @@ goto_location () {
     local alias="$1"
 
     if [ -z "$alias" ]; then
-        echo "$help_to"
+        message info "$help_to"
         return 0
     fi
 
     local location=$(resolve_alias "$alias")
 
     if [ -z "$location" ]; then
-        echo "No alias found matching $alias"
+        message error "No alias found matching '$alias'"
         return 0
     fi
 
@@ -86,7 +137,7 @@ delete_alias () {
     local alias="$1"
 
     if [ -z "$alias" ]; then
-        echo "$help_rm"
+        message info "$help_rm"
         return 0;
     fi
 
@@ -94,26 +145,18 @@ delete_alias () {
 }
 
 list_aliases () {
-    cat "$config"
+    message table "$(cat "$config")"
 }
 
 get_installation_location () {
-    echo "$NAV_PATH"
-}
-
-get_usage_instructions () {
-    echo "Available actions:"
-    echo "- pin ($help_pin)"
-    echo "- to ($help_to)"
-    echo "- rm ($help_rm)"
-    echo "- list"
-    echo "- which"
-    echo "- update"
+    message info "$NAV_PATH"
 }
 
 download_latest_executable () {
     $(cd "$NAV_PATH" && curl -OJ https://raw.githubusercontent.com/safe-k/nav/master/nav)
-    echo -e "Executable updated. Please run \`source $NAV_PATH/nav\`"
+
+    message info "Executable updated."
+    message generic "Please run \`$(message instruction "source $NAV_PATH/nav")\`."
 }
 
 nav () {
