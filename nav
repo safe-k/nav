@@ -108,6 +108,12 @@ get_usage_instructions () {
     echo "- rm ($help_rm)"
     echo "- list"
     echo "- which"
+    echo "- update"
+}
+
+download_latest_executable () {
+    $(cd "$NAV_PATH" && curl -OJ https://raw.githubusercontent.com/safe-k/nav/master/nav)
+    echo -e "Executable updated. Please run \`source $NAV_PATH/nav\`"
 }
 
 nav () {
@@ -120,6 +126,7 @@ nav () {
         (rm) delete_alias "$2";;
         (help) get_usage_instructions;;
         (which) get_installation_location;;
+        (update) download_latest_executable;;
         (*) nav help ;;
     esac
 }

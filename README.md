@@ -81,3 +81,14 @@ nav which
 ```
 </p>
 </details>
+
+<details>
+<summary>update</summary>
+<p>
+Downloads the latest version of the executable.
+
+```bash
+nav update
+```
+</p>
+</details>
