@@ -61,7 +61,7 @@ alias_location () {
         delete_alias "$alias"
     fi
 
-    echo "$alias=$location" >> "$config"
+    echo "$alias=${location%/}" >> "$config"
 }
 
 goto_location () {

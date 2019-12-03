@@ -35,7 +35,7 @@ run () {
 
     ## pin
     nav pin . lab
-    nav pin ./Someplace place
+    nav pin ./Someplace/ place
     nav pin Someplace/Somewhere where
     nav pin "$LAB_DIR/Someplace/Somewhere/Deep Inside" inside
 
