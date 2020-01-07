@@ -45,7 +45,7 @@ message () {
             (info) colour="$GREY";;
             (instruction) colour="$BLUE";;
             (header) format="$BOLD";;
-            (table) "$message" | column -s "=" -t
+            (table) message="$(echo "$message" | column -s "=" -t)";;
         esac
 
         echo -e "${format}${colour}$message${NF}${NC}"
@@ -145,7 +145,11 @@ delete_alias () {
 }
 
 list_aliases () {
-    message table "$(cat "$config")"
+    local aliases="$(cat "$config")"
+
+    if [ ! -z "$aliases" ]; then
+        message table "$aliases"
+    fi
 }
 
 get_installation_location () {
