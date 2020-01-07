@@ -177,5 +177,3 @@ nav () {
         (*) nav help ;;
     esac
 }
-
-export nav
