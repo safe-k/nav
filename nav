@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+set -e
+
 NAV_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 config="$NAV_PATH/.nav.config"
