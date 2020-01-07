@@ -4,9 +4,9 @@ name: Test
 
 jobs:
   test:
-    name: Run tests
+    name: Test
     runs-on: macOS-latest
     steps:
     - uses: actions/checkout@v1
-    - run: results=$(./nav.test.sh)
-    - run: if [ ! ${results:0:4} == Pass ]; then return 0; fi
+    - name: Run Unit Test
+      run: ./nav.test.sh

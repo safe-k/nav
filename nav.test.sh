@@ -2,6 +2,8 @@
 
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+set -e
+
 FAILS=0
 PASSES=0
 
@@ -73,11 +75,9 @@ run () {
 
 run
 
-if [ "$FAILS" = 0 ]; then
-    echo "Pass"
-else
-    echo "Fail"
-fi
-
 echo "$PASSES Successful"
 echo "$FAILS Failed"
+
+if [ ! "$FAILS" = 0 ]; then
+    exit 1
+fi
