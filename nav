@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NAV_PATH="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+NAV_PATH=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
 config="$NAV_PATH/.nav.config"
 if [ ! -f "$config" ]; then
@@ -52,7 +52,7 @@ __nav_message () {
             (action) colour="$GREEN";;
             (instruction) colour="$BLUE";;
             (header) format="$BOLD";;
-            (table) message="$(echo "$message" | column -s "=" -t)";;
+            (table) message=$(echo "$message" | column -s "=" -t);;
         esac
 
         echo -e "${format}${colour}$message${NF}${NC}"
@@ -86,6 +86,24 @@ __nav_resolve_alias () {
     fi
 }
 
+__nav_normalise_location_path () {
+    local location="$1"
+
+    if [ "$location" = "." ]; then
+        location=$(pwd)
+    elif [ ${location:0:2} = "./" ]; then
+        location=$(pwd)"${location:1}"
+    elif [ ! ${location:0:1} = "/" ]; then
+        location=$(pwd)"/$location"
+    elif [ "$location" = "~" ]; then
+        location=$(echo ~)
+    elif [ ${location:0:2} = "~/" ]; then
+        location=$(echo ~)"${location:1}"
+    fi
+
+    echo "$location"
+}
+
 __nav_alias_location () {
     local location="$1"
     local alias="$2"
@@ -95,16 +113,13 @@ __nav_alias_location () {
         return 1
     fi
 
-    if [ ${location:0:1} = "." ]; then
-        location="$(pwd)${location:1}"
-    elif [ ! ${location:0:1} = "/" ]; then
-        location="$(pwd)/$location"
-    elif [ ${location:0:1} = "~" ]; then
-        location="$("$location")"
+    local location_path=$(__nav_normalise_location_path "$location")
+    if [ ! "$?" -eq 0 ] || [ -z "$location_path" ]; then
+        __nav_message error "'$1' could not be resolved"
+        return 1
     fi
-
-    if [ ! -d "$location" ]; then
-        __nav_message error "'$location' is not a directory"
+    if [ ! -d "$location_path" ]; then
+        __nav_message error "'$location_path' is not a directory"
         return 1
     fi
 
@@ -119,9 +134,9 @@ __nav_alias_location () {
         __nav_delete_alias "$alias"
     fi
 
-    echo "$alias=${location%/}" >> "$config"
+    echo "$alias=${location_path%/}" >> "$config"
 
-    __nav_message action "Pinned $location as '$alias'"
+    __nav_message action "Pinned $location_path as '$alias'"
 }
 
 __nav_goto_location () {
@@ -158,7 +173,7 @@ __nav_delete_alias () {
 }
 
 __nav_list_aliases () {
-    local aliases="$(cat "$config")"
+    local aliases=$(cat "$config")
 
     if [ ! -z "$aliases" ]; then
         __nav_message table "$aliases"
