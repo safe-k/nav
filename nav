@@ -93,6 +93,9 @@ __nav_normalise_location_path () {
         location=$(pwd)
     elif [ ${location:0:2} = "./" ]; then
         location=$(pwd)"${location:1}"
+    elif [ "$location" = ".." ]; then
+        # Resolving '..' is not currently supported
+        return 1
     elif [ ! ${location:0:1} = "/" ]; then
         location=$(pwd)"/$location"
     elif [ "$location" = "~" ]; then
