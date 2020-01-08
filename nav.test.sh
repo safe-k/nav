@@ -42,17 +42,18 @@ run () {
     ## pin
     exec_nav pin . lab
     exec_nav pin ./Someplace/ place
-    exec_nav pin Someplace/Somewhere where
+    exec_nav pin Someplace/Somewhere
     exec_nav pin "$LAB_DIR/Someplace/Somewhere/Deep Inside" inside
 
     assert_equal "$(exec_nav pin invalid-dir dir)" "'$(pwd)/invalid-dir' is not a directory"
     assert_equal "$(exec_nav pin . "£@invalid-name")" "Alias must only contain alphanumeric characters"
+    assert_equal "$(exec_nav pin ..)" "'..' could not be resolved"
 
     ## to
     exec_nav to place
     assert_equal "$(pwd)" "$LAB_DIR/Someplace"
 
-    exec_nav to where
+    exec_nav to Somewhere
     assert_equal "$(pwd)" "$LAB_DIR/Someplace/Somewhere"
 
     exec_nav to inside
@@ -62,7 +63,7 @@ run () {
     assert_equal "$(pwd)" "$LAB_DIR"
 
     ## rm
-    exec_nav rm where
+    exec_nav rm Somewhere
     exec_nav rm inside
     assert_equal "$(exec_nav to inside)" "No alias found matching 'inside'"
 

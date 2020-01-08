@@ -21,7 +21,7 @@ NC="\033[0m"
 BOLD=$(tput bold)
 NF=$(tput sgr0)
 
-help_pin="Usage: nav pin [location] [alias]"
+help_pin="Usage: nav pin [location] (alias)"
 help_to="Usage: nav to [alias]"
 help_rm="Usage: nav rm [alias]"
 
@@ -109,9 +109,8 @@ __nav_normalise_location_path () {
 
 __nav_alias_location () {
     local location="$1"
-    local alias="$2"
 
-    if [[ -z "$location" || -z "$alias" ]]; then
+    if [[ -z "$1" ]]; then
         __nav_message info "$help_pin"
         return 1
     fi
@@ -126,7 +125,10 @@ __nav_alias_location () {
         return 1
     fi
 
-    if [[ "$alias" =~ [^a-zA-Z0-9] ]]; then
+    local alias="$2"
+    if [ -z "$alias" ]; then
+        alias=$(basename "$location_path")
+    elif [[ "$alias" =~ [^a-zA-Z0-9] ]]; then
         __nav_message error "Alias must only contain alphanumeric characters"
         return 1
     fi
