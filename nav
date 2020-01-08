@@ -92,7 +92,7 @@ __nav_alias_location () {
 
     if [[ -z "$location" || -z "$alias" ]]; then
         __nav_message info "$help_pin"
-        return 0
+        return 1
     fi
 
     if [ ${location:0:1} = "." ]; then
@@ -105,12 +105,12 @@ __nav_alias_location () {
 
     if [ ! -d "$location" ]; then
         __nav_message error "'$location' is not a directory"
-        return 0
+        return 1
     fi
 
     if [[ "$alias" =~ [^a-zA-Z0-9] ]]; then
         __nav_message error "Alias must only contain alphanumeric characters"
-        return 0
+        return 1
     fi
 
     local existing_alias=$(__nav_resolve_alias "$alias")
@@ -129,14 +129,14 @@ __nav_goto_location () {
 
     if [ -z "$alias" ]; then
         __nav_message info "$help_to"
-        return 0
+        return 1
     fi
 
     local location=$(__nav_resolve_alias "$alias")
 
     if [ -z "$location" ]; then
         __nav_message error "No alias found matching '$alias'"
-        return 0
+        return 1
     fi
 
     cd "$location"
@@ -149,7 +149,7 @@ __nav_delete_alias () {
 
     if [ -z "$alias" ]; then
         __nav_message info "$help_rm"
-        return 0;
+        return 1;
     fi
 
     sed -i '' "/^$alias/d" "$config"
