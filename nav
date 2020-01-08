@@ -188,7 +188,11 @@ __nav_get_installation_location () {
 }
 
 __nav_download_latest_executable () {
-    $(cd "$NAV_PATH" && curl -OJ https://raw.githubusercontent.com/safe-k/nav/master/nav)
+    $(cd "$NAV_PATH" && curl -OJf https://raw.githubusercontent.com/safe-k/nav/master/nav)
+    if [ ! "$?" -eq 0 ]; then
+        __nav_message error "Could not update executable"
+        return 1;
+    fi
 
     __nav_message action "Executable updated"
     __nav_message generic "Please run \`$(__nav_message instruction "source $NAV_PATH/nav")\`"
