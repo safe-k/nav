@@ -17,7 +17,7 @@ assert_equal () {
 }
 
 exec_nav () {
-    FORMAT="false" nav "$@"
+    NO_ACTION_MESSAGES="true" FORMAT="false" nav "$@"
 }
 
 run () {

@@ -10,12 +10,14 @@ if [ ! -f "$config" ]; then
 fi
 
 # Formatting config
+NO_ACTION_MESSAGES="false"
 FORMAT="true"
 
 RED="\033[0;31m"
 BLUE="\033[0;34m"
 GREY="\033[0;37m"
 ORANGE="\033[0;33m"
+GREEN="\033[0;32m"
 NC="\033[0m"
 
 BOLD=$(tput bold)
@@ -28,6 +30,10 @@ help_rm="Usage: nav rm [alias]"
 __nav_message () {
     local type="$1"
     local message="$2"
+
+    if [ "$NO_ACTION_MESSAGES" == "true" ] && [ "$type" == "action" ]; then
+        return 0;
+    fi
 
     local colour="$NC"
     local format="$NF"
@@ -45,6 +51,7 @@ __nav_message () {
                 message="Warning: $message"
                 ;;
             (info) colour="$GREY";;
+            (action) colour="$GREEN";;
             (instruction) colour="$BLUE";;
             (header) format="$BOLD";;
             (table) message="$(echo "$message" | column -s "=" -t)";;
@@ -115,6 +122,8 @@ __nav_alias_location () {
     fi
 
     echo "$alias=${location%/}" >> "$config"
+
+    __nav_message action "Pinned $location as '$alias'"
 }
 
 __nav_goto_location () {
@@ -133,6 +142,8 @@ __nav_goto_location () {
     fi
 
     cd "$location"
+
+    __nav_message action "Moved to $location"
 }
 
 __nav_delete_alias () {
@@ -144,6 +155,8 @@ __nav_delete_alias () {
     fi
 
     sed -i '' "/^$alias/d" "$config"
+
+    __nav_message action "Removed location with alias '$alias'"
 }
 
 __nav_list_aliases () {
@@ -161,8 +174,8 @@ __nav_get_installation_location () {
 __nav_download_latest_executable () {
     $(cd "$NAV_PATH" && curl -OJ https://raw.githubusercontent.com/safe-k/nav/master/nav)
 
-    __nav_message info "Executable updated."
-    __nav_message generic "Please run \`$(__nav_message instruction "source $NAV_PATH/nav")\`."
+    __nav_message action "Executable updated"
+    __nav_message generic "Please run \`$(__nav_message instruction "source $NAV_PATH/nav")\`"
 }
 
 nav () {
