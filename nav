@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-NAV_PATH=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+NAV_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 config="$NAV_PATH/.nav.config"
 if [ ! -f "$config" ]; then
@@ -72,8 +72,9 @@ __nav_get_usage_instructions () {
 __nav_resolve_alias () {
     local location
 
-    while read line; do
-        local alias=$(echo "$line" | cut -d "=" -f 1)
+    while read -r line; do
+        local alias
+        alias=$(echo "$line" | cut -d "=" -f 1)
 
         if [ "$1" == "$alias" ]; then
             location=$(echo "$line" | cut -d "=" -f 2)
@@ -81,7 +82,7 @@ __nav_resolve_alias () {
         fi
     done < "$config"
 
-    if [ ! -z "$location" ]; then
+    if [ -n "$location" ]; then
         echo "$location"
     fi
 }
@@ -89,19 +90,20 @@ __nav_resolve_alias () {
 __nav_normalise_location_path () {
     local location="$1"
 
+    # shellcheck disable=SC2088
     if [ "$location" = "." ]; then
         location=$(pwd)
-    elif [ ${location:0:2} = "./" ]; then
+    elif [ "${location:0:2}" = "./" ]; then
         location=$(pwd)"${location:1}"
     elif [ "$location" = ".." ]; then
         # Resolving '..' is not currently supported
         return 1
-    elif [ ! ${location:0:1} = "/" ]; then
+    elif [ ! "${location:0:1}" = "/" ]; then
         location=$(pwd)"/$location"
     elif [ "$location" = "~" ]; then
-        location=$(echo ~)
-    elif [ ${location:0:2} = "~/" ]; then
-        location=$(echo ~)"${location:1}"
+        location="$HOME"
+    elif [ "${location:0:2}" = "~/" ]; then
+        location="$HOME${location:1}"
     fi
 
     echo "$location"
@@ -115,11 +117,12 @@ __nav_alias_location () {
         return 1
     fi
 
-    local location_path=$(__nav_normalise_location_path "$location")
-    if [ ! "$?" -eq 0 ] || [ -z "$location_path" ]; then
+    local location_path
+    if ! location_path=$(__nav_normalise_location_path "$location") || [ -z "$location_path" ]; then
         __nav_message error "'$1' could not be resolved"
         return 1
     fi
+
     if [ ! -d "$location_path" ]; then
         __nav_message error "'$location_path' is not a directory"
         return 1
@@ -133,8 +136,10 @@ __nav_alias_location () {
         return 1
     fi
 
-    local existing_alias=$(__nav_resolve_alias "$alias")
-    if [ ! -z "$existing_alias" ]; then
+    local existing_alias
+
+    existing_alias=$(__nav_resolve_alias "$alias")
+    if [ -n "$existing_alias" ]; then
         __nav_message warning "Overwriting existing value for '$alias'"
         __nav_delete_alias "$alias"
     fi
@@ -152,14 +157,15 @@ __nav_goto_location () {
         return 1
     fi
 
-    local location=$(__nav_resolve_alias "$alias")
+    local location
+    location=$(__nav_resolve_alias "$alias")
 
     if [ -z "$location" ]; then
         __nav_message error "No alias found matching '$alias'"
         return 1
     fi
 
-    cd "$location"
+    cd "$location" || { echo "Could not navigate to $location"; exit 1; }
 
     __nav_message action "Moved to $location"
 }
@@ -178,9 +184,10 @@ __nav_delete_alias () {
 }
 
 __nav_list_aliases () {
-    local aliases=$(cat "$config")
+    local aliases
+    aliases=$(cat "$config")
 
-    if [ ! -z "$aliases" ]; then
+    if [ -n "$aliases" ]; then
         __nav_message table "$aliases"
     fi
 }
@@ -190,8 +197,7 @@ __nav_get_installation_location () {
 }
 
 __nav_download_latest_executable () {
-    $(cd "$NAV_PATH" && curl -OJf https://raw.githubusercontent.com/safe-k/nav/master/nav)
-    if [ ! "$?" -eq 0 ]; then
+    if ! (cd "$NAV_PATH" && curl -OJf https://raw.githubusercontent.com/safe-k/nav/master/nav); then
         __nav_message error "Could not update executable"
         return 1;
     fi

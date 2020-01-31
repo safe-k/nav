@@ -2,7 +2,7 @@
 
 set -e
 
-DIR=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 FAILS=0
 PASSES=0
@@ -27,9 +27,9 @@ run () {
     cd "$LAB_DIR"
 
     NAV="$LAB_DIR/nav"
-    NAV_CONFIG="$LAB_DIR/.nav.config"
     cp "$DIR/nav" "$NAV"
 
+    # shellcheck source=nav
     source "$NAV"
 
     # 2 Define tests
