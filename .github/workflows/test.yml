@@ -8,5 +8,9 @@ jobs:
     runs-on: macOS-latest
     steps:
     - uses: actions/checkout@v1
+    - name: Install Shellcheck
+      run: brew install shellcheck
+    - name: Run Shellcheck
+      run: shellcheck *.sh
     - name: Run Unit Test
       run: TERM="xterm-256color" ./nav.test.sh
