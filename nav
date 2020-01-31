@@ -4,7 +4,7 @@ NAV_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
 config="$NAV_PATH/.nav.config"
 if [ ! -f "$config" ]; then
-    touch "$config"
+  touch "$config"
 fi
 
 # Formatting config
@@ -25,198 +25,201 @@ help_pin="Usage: nav pin [location] (alias)"
 help_to="Usage: nav to [alias]"
 help_rm="Usage: nav rm [alias]"
 
-__nav_message () {
-    local type="$1"
-    local message="$2"
+__nav_message() {
+  local type="$1"
+  local message="$2"
 
-    if [ "$NO_ACTION_MESSAGES" == "true" ] && [ "$type" == "action" ]; then
-        return 0;
-    fi
+  if [ "$NO_ACTION_MESSAGES" == "true" ] && [ "$type" == "action" ]; then
+    return 0
+  fi
 
-    local colour="$NC"
-    local format="$NF"
+  local colour="$NC"
+  local format="$NF"
 
-    if [ "$FORMAT" == "false" ]; then
-        echo "$message"
-    else
-        case "$type" in
-            (error)
-                colour="$RED"
-                message="Error: $message"
-                ;;
-            (warning)
-                colour="$ORANGE"
-                message="Warning: $message"
-                ;;
-            (info) colour="$GREY";;
-            (action) colour="$GREEN";;
-            (instruction) colour="$BLUE";;
-            (header) format="$BOLD";;
-            (table) message=$(echo "$message" | column -s "=" -t);;
-        esac
-
-        echo -e "${format}${colour}$message${NF}${NC}"
-    fi
-}
-
-__nav_get_usage_instructions () {
-    __nav_message header "Available actions:"
-    __nav_message generic "- $(__nav_message instruction pin) $(__nav_message info "($help_pin)")"
-    __nav_message generic "- $(__nav_message instruction to) $(__nav_message info "($help_to)")"
-    __nav_message generic "- $(__nav_message instruction rm) $(__nav_message info "($help_rm)")"
-    __nav_message generic "- $(__nav_message instruction list)"
-    __nav_message generic "- $(__nav_message instruction which)"
-    __nav_message generic "- $(__nav_message instruction update)"
-}
-
-__nav_resolve_alias () {
-    local location
-
-    while read -r line; do
-        local alias
-        alias=$(echo "$line" | cut -d "=" -f 1)
-
-        if [ "$1" == "$alias" ]; then
-            location=$(echo "$line" | cut -d "=" -f 2)
-            break;
-        fi
-    done < "$config"
-
-    if [ -n "$location" ]; then
-        echo "$location"
-    fi
-}
-
-__nav_normalise_location_path () {
-    local location="$1"
-
-    # shellcheck disable=SC2088
-    if [ "$location" = "." ]; then
-        location=$(pwd)
-    elif [ "${location:0:2}" = "./" ]; then
-        location=$(pwd)"${location:1}"
-    elif [ "$location" = ".." ]; then
-        # Resolving '..' is not currently supported
-        return 1
-    elif [ ! "${location:0:1}" = "/" ]; then
-        location=$(pwd)"/$location"
-    elif [ "$location" = "~" ]; then
-        location="$HOME"
-    elif [ "${location:0:2}" = "~/" ]; then
-        location="$HOME${location:1}"
-    fi
-
-    echo "$location"
-}
-
-__nav_alias_location () {
-    local location="$1"
-
-    if [[ -z "$1" ]]; then
-        __nav_message info "$help_pin"
-        return 1
-    fi
-
-    local location_path
-    if ! location_path=$(__nav_normalise_location_path "$location") || [ -z "$location_path" ]; then
-        __nav_message error "'$1' could not be resolved"
-        return 1
-    fi
-
-    if [ ! -d "$location_path" ]; then
-        __nav_message error "'$location_path' is not a directory"
-        return 1
-    fi
-
-    local alias="$2"
-    if [ -z "$alias" ]; then
-        alias=$(basename "$location_path")
-    elif [[ "$alias" =~ [^a-zA-Z0-9] ]]; then
-        __nav_message error "Alias must only contain alphanumeric characters"
-        return 1
-    fi
-
-    local existing_alias
-
-    existing_alias=$(__nav_resolve_alias "$alias")
-    if [ -n "$existing_alias" ]; then
-        __nav_message warning "Overwriting existing value for '$alias'"
-        __nav_delete_alias "$alias"
-    fi
-
-    echo "$alias=${location_path%/}" >> "$config"
-
-    __nav_message action "Pinned $location_path as '$alias'"
-}
-
-__nav_goto_location () {
-    local alias="$1"
-
-    if [ -z "$alias" ]; then
-        __nav_message info "$help_to"
-        return 1
-    fi
-
-    local location
-    location=$(__nav_resolve_alias "$alias")
-
-    if [ -z "$location" ]; then
-        __nav_message error "No alias found matching '$alias'"
-        return 1
-    fi
-
-    cd "$location" || { echo "Could not navigate to $location"; exit 1; }
-
-    __nav_message action "Moved to $location"
-}
-
-__nav_delete_alias () {
-    local alias="$1"
-
-    if [ -z "$alias" ]; then
-        __nav_message info "$help_rm"
-        return 1;
-    fi
-
-    sed -i '' "/^$alias/d" "$config"
-
-    __nav_message action "Removed location with alias '$alias'"
-}
-
-__nav_list_aliases () {
-    local aliases
-    aliases=$(cat "$config")
-
-    if [ -n "$aliases" ]; then
-        __nav_message table "$aliases"
-    fi
-}
-
-__nav_get_installation_location () {
-    __nav_message info "$NAV_PATH"
-}
-
-__nav_download_latest_executable () {
-    if ! (cd "$NAV_PATH" && curl -OJf https://raw.githubusercontent.com/safe-k/nav/master/nav); then
-        __nav_message error "Could not update executable"
-        return 1;
-    fi
-
-    __nav_message action "Executable updated"
-    __nav_message generic "Please run \`$(__nav_message instruction "source $NAV_PATH/nav")\`"
-}
-
-nav () {
-    action="$1"
-
-    case "$action" in
-        (pin) __nav_alias_location "$2" "$3";;
-        (to) __nav_goto_location "$2";;
-        (list) __nav_list_aliases;;
-        (rm) __nav_delete_alias "$2";;
-        (help) __nav_get_usage_instructions;;
-        (which) __nav_get_installation_location;;
-        (update) __nav_download_latest_executable;;
-        (*) nav help ;;
+  if [ "$FORMAT" == "false" ]; then
+    echo "$message"
+  else
+    case "$type" in
+    error)
+      colour="$RED"
+      message="Error: $message"
+      ;;
+    warning)
+      colour="$ORANGE"
+      message="Warning: $message"
+      ;;
+    info) colour="$GREY" ;;
+    action) colour="$GREEN" ;;
+    instruction) colour="$BLUE" ;;
+    header) format="$BOLD" ;;
+    table) message=$(echo "$message" | column -s "=" -t) ;;
     esac
+
+    echo -e "${format}${colour}$message${NF}${NC}"
+  fi
+}
+
+__nav_get_usage_instructions() {
+  __nav_message header "Available actions:"
+  __nav_message generic "- $(__nav_message instruction pin) $(__nav_message info "($help_pin)")"
+  __nav_message generic "- $(__nav_message instruction to) $(__nav_message info "($help_to)")"
+  __nav_message generic "- $(__nav_message instruction rm) $(__nav_message info "($help_rm)")"
+  __nav_message generic "- $(__nav_message instruction list)"
+  __nav_message generic "- $(__nav_message instruction which)"
+  __nav_message generic "- $(__nav_message instruction update)"
+}
+
+__nav_resolve_alias() {
+  local location
+
+  while read -r line; do
+    local alias
+    alias=$(echo "$line" | cut -d "=" -f 1)
+
+    if [ "$1" == "$alias" ]; then
+      location=$(echo "$line" | cut -d "=" -f 2)
+      break
+    fi
+  done <"$config"
+
+  if [ -n "$location" ]; then
+    echo "$location"
+  fi
+}
+
+__nav_normalise_location_path() {
+  local location="$1"
+
+  # shellcheck disable=SC2088
+  if [ "$location" = "." ]; then
+    location=$(pwd)
+  elif [ "${location:0:2}" = "./" ]; then
+    location=$(pwd)"${location:1}"
+  elif [ "$location" = ".." ]; then
+    # Resolving '..' is not currently supported
+    return 1
+  elif [ ! "${location:0:1}" = "/" ]; then
+    location=$(pwd)"/$location"
+  elif [ "$location" = "~" ]; then
+    location="$HOME"
+  elif [ "${location:0:2}" = "~/" ]; then
+    location="$HOME${location:1}"
+  fi
+
+  echo "$location"
+}
+
+__nav_alias_location() {
+  local location="$1"
+
+  if [[ -z "$1" ]]; then
+    __nav_message info "$help_pin"
+    return 1
+  fi
+
+  local location_path
+  if ! location_path=$(__nav_normalise_location_path "$location") || [ -z "$location_path" ]; then
+    __nav_message error "'$1' could not be resolved"
+    return 1
+  fi
+
+  if [ ! -d "$location_path" ]; then
+    __nav_message error "'$location_path' is not a directory"
+    return 1
+  fi
+
+  local alias="$2"
+  if [ -z "$alias" ]; then
+    alias=$(basename "$location_path")
+  elif [[ "$alias" =~ [^a-zA-Z0-9] ]]; then
+    __nav_message error "Alias must only contain alphanumeric characters"
+    return 1
+  fi
+
+  local existing_alias
+
+  existing_alias=$(__nav_resolve_alias "$alias")
+  if [ -n "$existing_alias" ]; then
+    __nav_message warning "Overwriting existing value for '$alias'"
+    __nav_delete_alias "$alias"
+  fi
+
+  echo "$alias=${location_path%/}" >>"$config"
+
+  __nav_message action "Pinned $location_path as '$alias'"
+}
+
+__nav_goto_location() {
+  local alias="$1"
+
+  if [ -z "$alias" ]; then
+    __nav_message info "$help_to"
+    return 1
+  fi
+
+  local location
+  location=$(__nav_resolve_alias "$alias")
+
+  if [ -z "$location" ]; then
+    __nav_message error "No alias found matching '$alias'"
+    return 1
+  fi
+
+  cd "$location" || {
+    echo "Could not navigate to $location"
+    exit 1
+  }
+
+  __nav_message action "Moved to $location"
+}
+
+__nav_delete_alias() {
+  local alias="$1"
+
+  if [ -z "$alias" ]; then
+    __nav_message info "$help_rm"
+    return 1
+  fi
+
+  sed -i '' "/^$alias/d" "$config"
+
+  __nav_message action "Removed location with alias '$alias'"
+}
+
+__nav_list_aliases() {
+  local aliases
+  aliases=$(cat "$config")
+
+  if [ -n "$aliases" ]; then
+    __nav_message table "$aliases"
+  fi
+}
+
+__nav_get_installation_location() {
+  __nav_message info "$NAV_PATH"
+}
+
+__nav_download_latest_executable() {
+  if ! (cd "$NAV_PATH" && curl -OJf https://raw.githubusercontent.com/safe-k/nav/master/nav); then
+    __nav_message error "Could not update executable"
+    return 1
+  fi
+
+  __nav_message action "Executable updated"
+  __nav_message generic "Please run \`$(__nav_message instruction "source $NAV_PATH/nav")\`"
+}
+
+nav() {
+  action="$1"
+
+  case "$action" in
+  pin) __nav_alias_location "$2" "$3" ;;
+  to) __nav_goto_location "$2" ;;
+  list) __nav_list_aliases ;;
+  rm) __nav_delete_alias "$2" ;;
+  help) __nav_get_usage_instructions ;;
+  which) __nav_get_installation_location ;;
+  update) __nav_download_latest_executable ;;
+  *) nav help ;;
+  esac
 }
