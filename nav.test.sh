@@ -3,6 +3,7 @@
 set -e
 
 DIR=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+SCRIPT="nav.sh"
 
 FAILS=0
 PASSES=0
@@ -26,11 +27,11 @@ run() {
   mkdir "${LAB_DIR}"
   cd "${LAB_DIR}"
 
-  NAV="${LAB_DIR}/nav"
-  cp "${DIR}/nav" "${NAV}"
+  LAB_SCRIPT="${LAB_DIR}/${SCRIPT}"
+  cp "${DIR}/${SCRIPT}" "${LAB_SCRIPT}"
 
-  # shellcheck source=nav
-  source "${NAV}"
+  # shellcheck source=nav.sh
+  source "${LAB_SCRIPT}"
 
   # 2 Define tests
 

@@ -6,12 +6,12 @@ A simple shell tool that enables file system location aliasing and navigation.
 
 ## Installation
 
-Download the binary file and source it in your `.bash_profile`.
+Download the script and source it in your `.bash_profile`.
 
 Example:
 ```bash
-curl -OJ https://raw.githubusercontent.com/safe-k/nav/master/nav
-echo "source nav" >> ~/.bash_profile
+curl -OJ https://raw.githubusercontent.com/safe-k/nav/master/nav.sh
+echo 'source "${NAV_PATH}/nav.sh"' >> ~/.bash_profile
 ```
 
 ## Usage
@@ -88,7 +88,7 @@ Prints out the installation location.
 
 ```bash
 > nav which
-/Users/seifkamal/src/nav
+/Users/seifkamal/nav
 ```
 </p>
 </details>
@@ -101,7 +101,7 @@ Downloads the latest version of the executable.
 ```bash
 > nav update
 Executable updated.
-Please run `source /Users/seifkamal/src/nav/nav`
+Please run `source /Users/seifkamal/nav.sh`
 ```
 </p>
 </details>
