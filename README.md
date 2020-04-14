@@ -1,6 +1,6 @@
 ![](https://github.com/safe-k/nav/workflows/Test/badge.svg)
 
-# nav
+# Nav
 
 A simple shell tool that enables file system location aliasing and navigation.
 
@@ -10,98 +10,59 @@ Download the script and source it in your `.bash_profile`.
 
 Example:
 ```bash
-curl -OJ https://raw.githubusercontent.com/safe-k/nav/master/nav.sh
-echo 'source "${NAV_PATH}/nav.sh"' >> ~/.bash_profile
+(cd && curl -OJ https://raw.githubusercontent.com/safe-k/nav/master/nav.sh)
+echo "source nav.sh" >> ~/.bash_profile
 ```
 
 ## Usage
 
-<details>
-<summary>pin</summary>
-<p>
-Assigns an alias to the given location.
-
 ```bash
-> nav pin [location] [alias]
-```
-</p>
-</details>
-
-<details>
-<summary>to</summary>
-<p>
-Navigates to the location assigned to the given alias.
-
-```bash
-> nav to [alias]
-```
-</p>
-</details>
-
-<details>
-<summary>list</summary>
-<p>
-Lists all available location aliases.
-
-```bash
-> nav list
-deep      /Users/seifkamal/somewplace/somewhere/deep
-desktop   /Users/seifkamal/Desktop
-nav       /Users/seifkamal/projects/nav
-```
-</p>
-</details>
-
-<details>
-<summary>rm</summary>
-<p>
-Removes the given location alias.
-
-```bash
-> nav rm [alias]
-```
-</p>
-</details>
-
-<details>
-<summary>help</summary>
-<p>
-Prints out usage instructions.
-
-```bash
-> nav help
+$ nav help
 Available actions:
-- pin (Usage: nav pin [location] [alias])
+- pin (Usage: nav pin [location] (alias))
 - to (Usage: nav to [alias])
 - rm (Usage: nav rm [alias])
 - list
 - which
 - update
 ```
-</p>
-</details>
 
-<details>
-<summary>which</summary>
-<p>
-Prints out the installation location.
+### Summary
 
-```bash
-> nav which
-/Users/seifkamal/nav
-```
-</p>
-</details>
+#### `pin`
 
-<details>
-<summary>update</summary>
-<p>
-Downloads the latest version of the executable.
+Assigns an alias to the given directory.
 
 ```bash
-> nav update
-Executable updated.
-Please run `source /Users/seifkamal/nav.sh`
+$ nav pin . someapp
+Pinned /Users/seifkamal/SomeApplication as 'someapp'
 ```
-</p>
-</details>
+
+#### `to`
+
+Navigates to the location associated with the given alias.
+
+```bash
+$ nav to someapp
+Moved to /Users/seifkamal/SomeApplication
+```
+
+#### `list`
+
+Lists all available location aliases.
+
+```bash
+$ nav list
+desktop   /Users/seifkamal/Desktop
+nav       /Users/seifkamal/projects/nav
+someapp      /Users/seifkamal/SomeApplication
+```
+
+#### `rm`
+
+Removes the given location alias.
+
+```bash
+$ nav rm someapp
+Removed location with alias 'someapp'
+```
