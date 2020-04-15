@@ -35,14 +35,14 @@ __nav_message() {
   local type="${1}"
   local message="${2}"
 
-  if [ "${NO_ACTION_MESSAGES}" == "true" ] && [ "${type}" == "action" ]; then
+  if [ "${NO_ACTION_MESSAGES}" = "true" ] && [ "${type}" = "action" ]; then
     return 0
   fi
 
   local colour="${NC}"
   local format="${NF}"
 
-  if [ "${FORMAT}" == "false" ]; then
+  if [ "${FORMAT}" = "false" ]; then
     echo "${message}"
   else
     case "${type}" in
@@ -79,10 +79,11 @@ __nav_resolve_alias() {
   local location
 
   while read -r line; do
-    local alias
-    alias=$(echo "${line}" | cut -d "=" -f 1)
+    # Splitting the decleration and assignment here causes this variable to be printed like so: "alias=something"
+    # shellcheck disable=SC2155
+    local alias=$(echo "${line}" | cut -d "=" -f 1)
 
-    if [ "${1}" == "${alias}" ]; then
+    if [ "${1}" = "${alias}" ]; then
       location=$(echo "${line}" | cut -d "=" -f 2)
       break
     fi
