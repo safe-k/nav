@@ -72,6 +72,7 @@ __nav_get_usage_instructions() {
   __nav_message generic "- $(__nav_message instruction rm) $(__nav_message info "(${help_rm})")"
   __nav_message generic "- $(__nav_message instruction list)"
   __nav_message generic "- $(__nav_message instruction which)"
+  __nav_message generic "- $(__nav_message instruction which-conf)"
 }
 
 __nav_resolve_alias() {
@@ -201,6 +202,10 @@ __nav_get_installation_location() {
   __nav_message info "${NAV_PATH}"
 }
 
+__nav_get_config_location() {
+  __nav_message info "${CONFIG_PATH}"
+}
+
 nav() {
   action="${1}"
 
@@ -211,6 +216,7 @@ nav() {
   rm) __nav_delete_alias "${2}" ;;
   help) __nav_get_usage_instructions ;;
   which) __nav_get_installation_location ;;
+  which-conf) __nav_get_config_location ;;
   *) nav help ;;
   esac
 }
