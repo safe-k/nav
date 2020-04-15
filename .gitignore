@@ -1,3 +1,6 @@
 # Development
 .idea
 .DS_Store
+
+# Tests
+lab
