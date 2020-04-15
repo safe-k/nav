@@ -2,9 +2,15 @@
 
 NAV_PATH=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 
-config="${NAV_PATH}/.nav.config"
-if [ ! -f "${config}" ]; then
-  touch "${config}"
+: "${CONFIG_LOCATION:=${HOME}}"
+CONFIG_PATH="${CONFIG_LOCATION}/.nav/"
+if [ ! -d "${CONFIG_PATH}" ]; then
+  mkdir -p "${CONFIG_PATH}"
+fi
+
+MAP="${CONFIG_PATH}/MAP.txt"
+if [ ! -f "${MAP}" ]; then
+  touch "${MAP}"
 fi
 
 # Formatting config
@@ -80,7 +86,7 @@ __nav_resolve_alias() {
       location=$(echo "${line}" | cut -d "=" -f 2)
       break
     fi
-  done <"${config}"
+  done <"${MAP}"
 
   if [ -n "${location}" ]; then
     echo "${location}"
@@ -141,7 +147,7 @@ __nav_alias_location() {
     __nav_delete_alias "${alias}"
   fi
 
-  echo "${alias}=${location_path%/}" >>"${config}"
+  echo "${alias}=${location_path%/}" >>"${MAP}"
 
   __nav_message action "Pinned ${location_path} as '${alias}'"
 }
@@ -178,14 +184,14 @@ __nav_delete_alias() {
     return 1
   fi
 
-  sed -i '' "/^${alias}/d" "${config}"
+  sed -i '' "/^${alias}/d" "${MAP}"
 
   __nav_message action "Removed location with alias '${alias}'"
 }
 
 __nav_list_aliases() {
   local aliases
-  aliases=$(cat "${config}")
+  aliases=$(cat "${MAP}")
 
   if [ -n "${aliases}" ]; then
     __nav_message table "${aliases}"

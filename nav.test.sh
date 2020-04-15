@@ -31,7 +31,7 @@ run() {
   cp "${DIR}/${SCRIPT}" "${LAB_SCRIPT}"
 
   # shellcheck source=nav.sh
-  source "${LAB_SCRIPT}"
+  CONFIG_LOCATION="${LAB_DIR}" source "${LAB_SCRIPT}"
 
   # 2 Define tests
 
