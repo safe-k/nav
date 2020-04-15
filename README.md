@@ -6,6 +6,18 @@ A simple shell tool that enables file system location aliasing and navigation.
 
 ## Installation
 
+### Homebrew
+
+```bash
+brew tap safe-k/tap
+brew install nav
+```
+
+**Note:** Depending on the state of your `.bash_profile`, you may need to manually source the script.
+You'll be prompted by brew if you need to do so.
+
+### Curl
+
 Download the script and source it in your `.bash_profile`.
 
 Example:
