@@ -72,7 +72,6 @@ __nav_get_usage_instructions() {
   __nav_message generic "- $(__nav_message instruction rm) $(__nav_message info "(${help_rm})")"
   __nav_message generic "- $(__nav_message instruction list)"
   __nav_message generic "- $(__nav_message instruction which)"
-  __nav_message generic "- $(__nav_message instruction update)"
 }
 
 __nav_resolve_alias() {
@@ -202,16 +201,6 @@ __nav_get_installation_location() {
   __nav_message info "${NAV_PATH}"
 }
 
-__nav_download_latest_executable() {
-  if ! (cd "${NAV_PATH}" && curl -OJf https://raw.githubusercontent.com/safe-k/nav/master/nav.sh); then
-    __nav_message error "Could not update executable"
-    return 1
-  fi
-
-  __nav_message action "Executable updated"
-  __nav_message generic "Please run \`$(__nav_message instruction "source ${NAV_PATH}/nav.sh")\`"
-}
-
 nav() {
   action="${1}"
 
@@ -222,7 +211,6 @@ nav() {
   rm) __nav_delete_alias "${2}" ;;
   help) __nav_get_usage_instructions ;;
   which) __nav_get_installation_location ;;
-  update) __nav_download_latest_executable ;;
   *) nav help ;;
   esac
 }

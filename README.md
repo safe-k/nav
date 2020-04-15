@@ -36,7 +36,6 @@ Available actions:
 - rm (Usage: nav rm [alias])
 - list
 - which
-- update
 ```
 
 ### Summary
