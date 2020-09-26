@@ -1,4 +1,4 @@
-![](https://github.com/safe-k/nav/workflows/Test/badge.svg)
+![](https://github.com/seifkamal/nav/workflows/Test/badge.svg)
 
 # Nav
 
@@ -9,7 +9,7 @@ A simple shell tool that enables file system location aliasing and navigation.
 ### Homebrew
 
 ```bash
-brew tap safe-k/tap
+brew tap seifkamal/tap
 brew install nav
 ```
 
@@ -22,7 +22,7 @@ Download the script and source it in your `.bash_profile`.
 
 Example:
 ```bash
-(cd && curl -OJ https://raw.githubusercontent.com/safe-k/nav/master/nav.sh)
+(cd && curl -OJ https://raw.githubusercontent.com/seifkamal/nav/master/nav.sh)
 echo "source nav.sh" >> ~/.bash_profile
 ```
 
